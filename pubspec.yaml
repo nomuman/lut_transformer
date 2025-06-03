@@ -1,6 +1,6 @@
 name: lut_transformer
 description: "A Flutter plugin to apply 3D LUT (.cube) filters to videos on Android. Transforms video colors based on a provided LUT file."
-version: 1.0.0 
+version: 1.0.1
 homepage: https://github.com/nomuman/lut_transformer 
 repository: https://github.com/nomuman/lut_transformer 
 issue_tracker: https://github.com/nomuman/lut_transformer/issues 

@@ -58,7 +58,7 @@ import 'dart:io'; // For File objects
 
 ### Transforming a Video
 
-To transform a video, use the static method `LutTransformer.transformVideo`. You need to provide the input video `File` and the asset path to your `.cube` LUT file.
+To transform a video, use the static method `LutTransformer.transformVideo`. You need to provide the input video `File` and optionally the asset path to your `.cube` LUT file. If `lutAsset` is `null`, the video will only be cropped to a square.
 
 The method returns a `Stream<TransformProgress>` which emits progress updates and the final result (output path or error).
 
@@ -75,10 +75,10 @@ The method returns a `Stream<TransformProgress>` which emits progress updates an
 2.  **Call `transformVideo` and listen to the stream:**
 
     ```dart
-    Future<void> applyLutToVideo(File videoFile, String lutAssetPath) async {
+    Future<void> applyLutToVideo(File videoFile, String? lutAssetPath) async {
       final Stream<TransformProgress> progressStream = LutTransformer.transformVideo(
         videoFile,
-        lutAsset: lutAssetPath, // e.g., 'assets/luts/my_custom_lut.cube'
+        lutAsset: lutAssetPath, // e.g., 'assets/luts/my_custom_lut.cube' or null
       );
 
       await for (final TransformProgress progressData in progressStream) {

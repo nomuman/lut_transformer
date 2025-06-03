@@ -57,10 +57,10 @@ class LutTransformerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Act
         when (call.method) {
             "transformVideo" -> {
                 val inputPath = call.argument<String>("inputPath")
-                val lutAsset = call.argument<String>("lutAsset")
+                val lutAsset = call.argument<String?>("lutAsset")
 
-                if (inputPath == null || lutAsset == null) {
-                    result.error("INVALID_ARGUMENTS", "InputPath or lutAsset is null.", null)
+                if (inputPath == null) {
+                    result.error("INVALID_ARGUMENTS", "InputPath is null.", null)
                     return
                 }
 
@@ -98,7 +98,7 @@ class LutTransformerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Act
         activityRef: WeakReference<Activity>,
         assets: FlutterPlugin.FlutterAssets,
         inputPath: String,
-        lutAsset: String
+        lutAsset: String?
     ) {
         scope.launch {
             val activity = activityRef.get()

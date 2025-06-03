@@ -58,7 +58,7 @@ object VideoTransformer {
         context: Context,
         flutterAssets: FlutterAssets,
         inputVideoPath: String,
-        lutAssetKey: String,
+        lutAssetKey: String?,
         onProgress: (Double) -> Unit,
         onCompleted: (String) -> Unit,
         onError: (String, String?, Any?) -> Unit
@@ -69,15 +69,18 @@ object VideoTransformer {
         val transformationRunning = AtomicBoolean(false) // Tracks if the core transformation is active
 
         try {
-            Log.d(TAG, "Transform: Starting setup for video '$inputVideoPath' with LUT asset '$lutAssetKey'")
+            Log.d(TAG, "Transform: Starting setup for video '$inputVideoPath' with LUT asset '${lutAssetKey ?: "none"}'")
             onProgress(0.0) // Initial progress: Setup phase started
 
-            // Load LUT from assets
-            val actualLutAssetPath = flutterAssets.getAssetFilePathByName(lutAssetKey)
-            val lut = CubeParser.load(context, actualLutAssetPath) // This can throw IOException if LUT is invalid/not found
-            val lutEffect = SingleColorLut.createFromCube(lut)
             val videoEffects = mutableListOf<androidx.media3.common.Effect>()
-            videoEffects.add(lutEffect)
+
+            // Load LUT from assets if lutAssetKey is provided
+            if (lutAssetKey != null) {
+                val actualLutAssetPath = flutterAssets.getAssetFilePathByName(lutAssetKey)
+                val lut = CubeParser.load(context, actualLutAssetPath) // This can throw IOException if LUT is invalid/not found
+                val lutEffect = SingleColorLut.createFromCube(lut)
+                videoEffects.add(lutEffect)
+            }
 
             // Apply a 1:1 aspect ratio crop.
             // This is a fixed behavior of this plugin version.

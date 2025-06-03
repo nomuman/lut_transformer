@@ -1,3 +1,10 @@
+## 1.0.1
+
+* Modified `transformVideo` method:
+    * The `lutAsset` parameter is now nullable.
+    * If `lutAsset` is null, the video will only be cropped to a square.
+* Updated tests to cover the case where `lutAsset` is null.
+
 ## 1.0.0
 
 * Initial release of the `lut_transformer` plugin.

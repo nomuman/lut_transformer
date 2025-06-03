@@ -88,11 +88,12 @@ class LutTransformerPluginTest {
   }
 
   @Test
-  fun onMethodCall_transformVideo_withNullLutAsset_returnsError() {
-    val arguments = mapOf("inputPath" to "path/to/video.mp4", "lutAsset" to null)
+  fun onMethodCall_transformVideo_withNullLutAsset_callsStartVideoTransformationAndSucceeds() {
+    val arguments = mapOf<String, Any?>("inputPath" to "path/to/video.mp4", "lutAsset" to null)
     val call = MethodCall("transformVideo", arguments)
     plugin.onMethodCall(call, mockResult)
-    verify(mockResult).error(eq("INVALID_ARGUMENTS"), anyString(), eq(null))
+    verify(mockResult).success(null)
+    verify(mockResult, never()).error(anyString(), anyString(), anyString())
   }
 
   @Test

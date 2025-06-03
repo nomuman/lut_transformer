@@ -167,5 +167,108 @@ void main() {
       },
       timeout: const Timeout(Duration(minutes: 2)),
     ); // Video processing can take time
+
+    testWidgets(
+      'transformVideo successfully crops a video without a LUT',
+      (WidgetTester tester) async {
+        final ByteData videoData = await rootBundle.load(
+          'assets/videos/sample.mp4',
+        );
+        final Directory tempDir = await getTemporaryDirectory();
+        final File tempVideoFile = File(
+          '${tempDir.path}/temp_video_for_crop_test.mp4',
+        );
+        await tempVideoFile.writeAsBytes(
+          videoData.buffer.asUint8List(),
+          flush: true,
+        );
+
+        final List<TransformProgress> progressEvents = [];
+        String? finalOutputPath;
+        PlatformException? transformError;
+
+        // Call transformVideo with lutAsset as null
+        final stream = LutTransformer.transformVideo(
+          tempVideoFile,
+          lutAsset: null, // Test with null LUT
+        );
+
+        await for (final event in stream) {
+          debugPrint(
+            'Crop Progress: ${event.progress}, Output: ${event.outputPath}, Error: ${event.error}',
+          );
+          progressEvents.add(event);
+          if (event.outputPath != null) {
+            finalOutputPath = event.outputPath;
+          }
+          if (event.error != null) {
+            transformError = event.error;
+            break;
+          }
+        }
+
+        expect(
+          transformError,
+          isNull,
+          reason:
+              'transformVideo (crop only) should not produce an error. Error: ${transformError?.code} - ${transformError?.message}',
+        );
+        expect(
+          progressEvents,
+          isNotEmpty,
+          reason:
+              'Should have received at least one progress event (crop only).',
+        );
+
+        expect(
+          progressEvents.first.progress,
+          equals(0.0),
+          reason: 'Initial progress should be 0.0 (crop only).',
+        );
+
+        final lastEvent = progressEvents.lastWhere(
+          (e) => e.outputPath != null || e.error != null,
+          orElse: () => progressEvents.last,
+        );
+
+        expect(
+          lastEvent.progress,
+          equals(1.0),
+          reason: 'Final progress should be 1.0 on success (crop only).',
+        );
+        expect(
+          lastEvent.outputPath,
+          isNotNull,
+          reason: 'Output path should be set on success (crop only).',
+        );
+        expect(
+          finalOutputPath,
+          isNotNull,
+          reason: 'Final output path variable should be set (crop only).',
+        );
+        expect(
+          finalOutputPath,
+          endsWith('.mp4'),
+          reason: 'Output file should be an mp4 (crop only).',
+        );
+
+        if (finalOutputPath != null) {
+          final outputFile = File(finalOutputPath);
+          expect(
+            await outputFile.exists(),
+            isTrue,
+            reason:
+                'Transformed video file (crop only) should exist at $finalOutputPath.',
+          );
+          if (await outputFile.exists()) {
+            await outputFile.delete();
+          }
+        }
+        if (await tempVideoFile.exists()) {
+          await tempVideoFile.delete();
+        }
+      },
+      timeout: const Timeout(Duration(minutes: 2)),
+    );
   });
 }

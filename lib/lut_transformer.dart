@@ -39,14 +39,14 @@ class LutTransformer {
   /// Transforms a video using a LUT file and returns a stream of progress and the output file path.
   ///
   /// The [input] is the video file to be transformed.
-  /// The [lutAsset] is the asset path of the LUT filter to apply.
+  /// The [lutAsset] is the asset path of the LUT filter to apply. If null, the video will only be cropped to a square.
   ///
   /// Returns a [Stream<TransformProgress>] that emits [TransformProgress] objects
   /// indicating the progress of the transformation ([TransformProgress.progress]),
   /// the final output path ([TransformProgress.outputPath]), or an error ([TransformProgress.error]).
   static Stream<TransformProgress> transformVideo(
     File input, {
-    required String lutAsset,
+    String? lutAsset,
   }) {
     // Request the native side to start processing.
     // This call completes immediately, and the actual processing occurs in the background.
