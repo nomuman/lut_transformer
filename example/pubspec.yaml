@@ -1,0 +1,29 @@
+name: lut_transformer_example
+description: "Demonstrates how to use the lut_transformer plugin."
+publish_to: 'none' 
+
+environment:
+  sdk: ^3.8.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  lut_transformer:
+    path: ../
+  image_picker: ^1.1.2
+  video_player: ^2.9.1
+  saver_gallery: ^4.0.1
+
+dev_dependencies:
+  integration_test:
+    sdk: flutter
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  path_provider: ^2.1.5
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/luts/sample.cube
+    - assets/videos/sample.mp4
