@@ -80,8 +80,44 @@ class LutTransformerPluginTest {
   }
 
   @Test
+  fun onMethodCall_transformVideo_withFlipHorizontally_callsStartVideoTransformationAndSucceeds() {
+    val arguments = mapOf(
+        "inputPath" to "path/to/video.mp4",
+        "lutAsset" to "luts/sample.cube",
+        "flipHorizontally" to true
+    )
+    val call = MethodCall("transformVideo", arguments)
+    plugin.onMethodCall(call, mockResult)
+    verify(mockResult).success(null)
+  }
+
+  @Test
+  fun onMethodCall_transformVideo_withFlipHorizontallyFalse_callsStartVideoTransformationAndSucceeds() {
+    val arguments = mapOf(
+        "inputPath" to "path/to/video.mp4",
+        "lutAsset" to "luts/sample.cube",
+        "flipHorizontally" to false
+    )
+    val call = MethodCall("transformVideo", arguments)
+    plugin.onMethodCall(call, mockResult)
+    verify(mockResult).success(null)
+  }
+
+  @Test
+  fun onMethodCall_transformVideo_withFlipHorizontallyMissing_defaultsToFalseAndSucceeds() {
+    val arguments = mapOf(
+        "inputPath" to "path/to/video.mp4",
+        "lutAsset" to "luts/sample.cube"
+    )
+    val call = MethodCall("transformVideo", arguments)
+    plugin.onMethodCall(call, mockResult)
+    verify(mockResult).success(null)
+  }
+
+
+  @Test
   fun onMethodCall_transformVideo_withNullInputPath_returnsError() {
-    val arguments = mapOf("inputPath" to null, "lutAsset" to "luts/sample.cube")
+    val arguments = mapOf("inputPath" to null, "lutAsset" to "luts/sample.cube", "flipHorizontally" to false)
     val call = MethodCall("transformVideo", arguments)
     plugin.onMethodCall(call, mockResult)
     verify(mockResult).error(eq("INVALID_ARGUMENTS"), anyString(), eq(null))
@@ -89,7 +125,7 @@ class LutTransformerPluginTest {
 
   @Test
   fun onMethodCall_transformVideo_withNullLutAsset_callsStartVideoTransformationAndSucceeds() {
-    val arguments = mapOf<String, Any?>("inputPath" to "path/to/video.mp4", "lutAsset" to null)
+    val arguments = mapOf<String, Any?>("inputPath" to "path/to/video.mp4", "lutAsset" to null, "flipHorizontally" to false)
     val call = MethodCall("transformVideo", arguments)
     plugin.onMethodCall(call, mockResult)
     verify(mockResult).success(null)
@@ -101,7 +137,7 @@ class LutTransformerPluginTest {
     // Detach activity to simulate it not being available
     plugin.onDetachedFromActivity() // Sets activityBinding to null
 
-    val arguments = mapOf("inputPath" to "path/to/video.mp4", "lutAsset" to "luts/sample.cube")
+    val arguments = mapOf("inputPath" to "path/to/video.mp4", "lutAsset" to "luts/sample.cube", "flipHorizontally" to false)
     val call = MethodCall("transformVideo", arguments)
     plugin.onMethodCall(call, mockResult)
     verify(mockResult).error(eq("NO_ACTIVITY"), anyString(), eq(null))
@@ -131,7 +167,7 @@ class LutTransformerPluginTest {
     pluginWithNoAssets.onAttachedToActivity(tempMockActivityBinding)
 
 
-    val arguments = mapOf("inputPath" to "path/to/video.mp4", "lutAsset" to "luts/sample.cube")
+    val arguments = mapOf("inputPath" to "path/to/video.mp4", "lutAsset" to "luts/sample.cube", "flipHorizontally" to false)
     val call = MethodCall("transformVideo", arguments)
     val newMockResult: MethodChannel.Result = mock(MethodChannel.Result::class.java)
 

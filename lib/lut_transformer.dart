@@ -40,6 +40,7 @@ class LutTransformer {
   ///
   /// The [input] is the video file to be transformed.
   /// The [lutAsset] is the asset path of the LUT filter to apply. If null, the video will only be cropped to a square.
+  /// The [flipHorizontally] flag indicates whether to flip the video horizontally. Defaults to `false`.
   ///
   /// Returns a [Stream<TransformProgress>] that emits [TransformProgress] objects
   /// indicating the progress of the transformation ([TransformProgress.progress]),
@@ -47,6 +48,7 @@ class LutTransformer {
   static Stream<TransformProgress> transformVideo(
     File input, {
     String? lutAsset,
+    bool flipHorizontally = false,
   }) {
     // Request the native side to start processing.
     // This call completes immediately, and the actual processing occurs in the background.
@@ -54,6 +56,7 @@ class LutTransformer {
     _methodChannel.invokeMethod<void>('transformVideo', {
       'inputPath': input.path,
       'lutAsset': lutAsset,
+      'flipHorizontally': flipHorizontally,
     });
 
     return _eventChannel.receiveBroadcastStream().map((event) {

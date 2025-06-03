@@ -1,3 +1,8 @@
+## 1.0.2
+
+* Modified `transformVideo` method:
+    * Added `flipHorizontally` parameter to flip the video horizontally. Defaults to `false`.
+
 ## 1.0.1
 
 * Modified `transformVideo` method:

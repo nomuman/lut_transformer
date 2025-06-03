@@ -58,6 +58,7 @@ class LutTransformerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Act
             "transformVideo" -> {
                 val inputPath = call.argument<String>("inputPath")
                 val lutAsset = call.argument<String?>("lutAsset")
+                val flipHorizontally = call.argument<Boolean>("flipHorizontally") ?: false
 
                 if (inputPath == null) {
                     result.error("INVALID_ARGUMENTS", "InputPath is null.", null)
@@ -76,7 +77,7 @@ class LutTransformerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Act
                     Log.w(TAG, "transformVideo called but Flutter assets are not available.")
                     return
                 }
-                startVideoTransformation(WeakReference(activity), assets, inputPath, lutAsset)
+                startVideoTransformation(WeakReference(activity), assets, inputPath, lutAsset, flipHorizontally)
                 result.success(null) // Acknowledge the call, actual result/progress via EventChannel
             }
             "getPlatformVersion" -> {
@@ -93,12 +94,14 @@ class LutTransformerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Act
      * @param assets FlutterAssets for accessing plugin assets.
      * @param inputPath Path to the input video file.
      * @param lutAsset Asset path for the LUT file.
+     * @param flipHorizontally Whether to flip the video horizontally.
      */
     private fun startVideoTransformation(
         activityRef: WeakReference<Activity>,
         assets: FlutterPlugin.FlutterAssets,
         inputPath: String,
-        lutAsset: String?
+        lutAsset: String?,
+        flipHorizontally: Boolean
     ) {
         scope.launch {
             val activity = activityRef.get()
@@ -114,6 +117,7 @@ class LutTransformerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Act
                     assets,
                     inputPath,
                     lutAsset,
+                    flipHorizontally,
                     onProgress = { progress ->
                         // Ensure events are sent on the main thread
                         scope.launch(Dispatchers.Main) {

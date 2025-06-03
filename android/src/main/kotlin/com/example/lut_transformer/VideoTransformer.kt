@@ -7,6 +7,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.effect.Presentation
 import androidx.media3.effect.SingleColorLut
+import androidx.media3.effect.ScaleAndRotateTransformation
 import androidx.media3.transformer.Composition
 import androidx.media3.transformer.EditedMediaItem
 import androidx.media3.transformer.EditedMediaItemSequence
@@ -50,6 +51,7 @@ object VideoTransformer {
      * @param flutterAssets For accessing plugin assets like the LUT file.
      * @param inputVideoPath The file path of the input video.
      * @param lutAssetKey The asset key for the .cube LUT file (e.g., "luts/my_lut.cube").
+     * @param flipHorizontally Whether to flip the video horizontally.
      * @param onProgress Callback for progress updates (0.0 to 1.0).
      * @param onCompleted Callback when transformation is successful, providing the output file path.
      * @param onError Callback for errors, providing an error code, message, and details.
@@ -59,6 +61,7 @@ object VideoTransformer {
         flutterAssets: FlutterAssets,
         inputVideoPath: String,
         lutAssetKey: String?,
+        flipHorizontally: Boolean,
         onProgress: (Double) -> Unit,
         onCompleted: (String) -> Unit,
         onError: (String, String?, Any?) -> Unit
@@ -69,7 +72,7 @@ object VideoTransformer {
         val transformationRunning = AtomicBoolean(false) // Tracks if the core transformation is active
 
         try {
-            Log.d(TAG, "Transform: Starting setup for video '$inputVideoPath' with LUT asset '${lutAssetKey ?: "none"}'")
+            Log.d(TAG, "Transform: Starting setup for video '$inputVideoPath' with LUT asset '${lutAssetKey ?: "none"}', flip: $flipHorizontally")
             onProgress(0.0) // Initial progress: Setup phase started
 
             val videoEffects = mutableListOf<androidx.media3.common.Effect>()
@@ -80,6 +83,13 @@ object VideoTransformer {
                 val lut = CubeParser.load(context, actualLutAssetPath) // This can throw IOException if LUT is invalid/not found
                 val lutEffect = SingleColorLut.createFromCube(lut)
                 videoEffects.add(lutEffect)
+            }
+
+            if (flipHorizontally) {
+                val flipEffect = ScaleAndRotateTransformation.Builder()
+                    .setScale(-1f, 1f) // Scale X by -1 to flip horizontally
+                    .build()
+                videoEffects.add(flipEffect)
             }
 
             // Apply a 1:1 aspect ratio crop.

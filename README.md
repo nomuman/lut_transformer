@@ -10,6 +10,7 @@ A Flutter plugin for applying 3D LUT (Look-Up Table) filters to videos on the **
 - Apply `.cube` LUT files to videos.
 - Reports transformation progress.
 - Output video is cropped to a 1:1 aspect ratio (e.g., 1080x1080).
+- Option to flip the video horizontally.
 - Currently supports Android only.
 
 ## Platform Support
@@ -58,7 +59,7 @@ import 'dart:io'; // For File objects
 
 ### Transforming a Video
 
-To transform a video, use the static method `LutTransformer.transformVideo`. You need to provide the input video `File` and optionally the asset path to your `.cube` LUT file. If `lutAsset` is `null`, the video will only be cropped to a square.
+To transform a video, use the static method `LutTransformer.transformVideo`. You need to provide the input video `File`, optionally the asset path to your `.cube` LUT file, and an optional boolean `flipHorizontally` (defaults to `false`) to indicate if the video should be flipped horizontally. If `lutAsset` is `null`, the video will only be cropped to a square (and potentially flipped).
 
 The method returns a `Stream<TransformProgress>` which emits progress updates and the final result (output path or error).
 
@@ -75,10 +76,11 @@ The method returns a `Stream<TransformProgress>` which emits progress updates an
 2.  **Call `transformVideo` and listen to the stream:**
 
     ```dart
-    Future<void> applyLutToVideo(File videoFile, String? lutAssetPath) async {
+    Future<void> applyLutToVideo(File videoFile, String? lutAssetPath, bool shouldFlip) async {
       final Stream<TransformProgress> progressStream = LutTransformer.transformVideo(
         videoFile,
         lutAsset: lutAssetPath, // e.g., 'assets/luts/my_custom_lut.cube' or null
+        flipHorizontally: shouldFlip,
       );
 
       await for (final TransformProgress progressData in progressStream) {
@@ -104,7 +106,8 @@ The method returns a `Stream<TransformProgress>` which emits progress updates an
     // Example usage:
     // File myVideo = File('path/to/your/input_video.mp4');
     // String myLut = 'assets/luts/my_custom_lut.cube';
-    // await applyLutToVideo(myVideo, myLut);
+    // bool flip = true;
+    // await applyLutToVideo(myVideo, myLut, flip);
     ```
 
 ### `TransformProgress` Class

@@ -30,6 +30,7 @@ class _MyAppState extends State<MyApp> {
   String? _errorMessage;
   bool _isDownloading = false;
   String? _downloadMessage;
+  bool _flipHorizontally = false;
 
   @override
   void initState() {
@@ -108,7 +109,8 @@ class _MyAppState extends State<MyApp> {
     try {
       final stream = LutTransformer.transformVideo(
         File(_pickedVideoFile!.path),
-        lutAsset: 'assets/luts/sample.cube', // 使用するLUTファイルを指定
+        lutAsset: 'assets/luts/sample.cube',
+        flipHorizontally: _flipHorizontally,
       );
 
       await for (final event in stream) {
@@ -262,20 +264,34 @@ class _MyAppState extends State<MyApp> {
       children: [
         Text('2. 動画を加工', style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(height: 10),
-        ElevatedButton(
-          onPressed: _pickedVideoFile != null && !_isProcessing
-              ? _transformVideo
-              : null,
-          child: _isProcessing
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 2.0,
-                  ),
-                )
-              : const Text('動画を加工 (LUT適用)'),
+        Row(
+          children: [
+            ElevatedButton(
+              onPressed: _pickedVideoFile != null && !_isProcessing
+                  ? _transformVideo
+                  : null,
+              child: _isProcessing
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2.0,
+                      ),
+                    )
+                  : const Text('動画を加工 (LUT適用)'),
+            ),
+            const SizedBox(width: 10),
+            Text('左右反転:'),
+            Switch(
+              value: _flipHorizontally,
+              onChanged: (value) {
+                setState(() {
+                  _flipHorizontally = value;
+                });
+              },
+            ),
+          ],
         ),
         if (_isProcessing)
           Padding(

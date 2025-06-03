@@ -67,6 +67,7 @@ void main() {
         final stream = LutTransformer.transformVideo(
           tempVideoFile,
           lutAsset: lutAssetPath,
+          flipHorizontally: false,
         );
 
         await for (final event in stream) {
@@ -191,6 +192,7 @@ void main() {
         final stream = LutTransformer.transformVideo(
           tempVideoFile,
           lutAsset: null, // Test with null LUT
+          flipHorizontally: false,
         );
 
         await for (final event in stream) {
@@ -260,6 +262,113 @@ void main() {
             reason:
                 'Transformed video file (crop only) should exist at $finalOutputPath.',
           );
+          if (await outputFile.exists()) {
+            await outputFile.delete();
+          }
+        }
+        if (await tempVideoFile.exists()) {
+          await tempVideoFile.delete();
+        }
+      },
+      timeout: const Timeout(Duration(minutes: 2)),
+    );
+
+    testWidgets(
+      'transformVideo successfully processes a video with LUT and horizontal flip',
+      (WidgetTester tester) async {
+        final ByteData videoData = await rootBundle.load(
+          'assets/videos/sample.mp4',
+        );
+        final Directory tempDir = await getTemporaryDirectory();
+        final File tempVideoFile = File(
+          '${tempDir.path}/temp_video_for_flip_test.mp4',
+        );
+        await tempVideoFile.writeAsBytes(
+          videoData.buffer.asUint8List(),
+          flush: true,
+        );
+
+        const String lutAssetPath = 'assets/luts/sample.cube';
+        final List<TransformProgress> progressEvents = [];
+        String? finalOutputPath;
+        PlatformException? transformError;
+
+        final stream = LutTransformer.transformVideo(
+          tempVideoFile,
+          lutAsset: lutAssetPath,
+          flipHorizontally: true,
+        );
+
+        await for (final event in stream) {
+          debugPrint(
+            'Flip Test Progress: ${event.progress}, Output: ${event.outputPath}, Error: ${event.error}',
+          );
+          progressEvents.add(event);
+          if (event.outputPath != null) {
+            finalOutputPath = event.outputPath;
+          }
+          if (event.error != null) {
+            transformError = event.error;
+            break;
+          }
+        }
+
+        expect(
+          transformError,
+          isNull,
+          reason:
+              'transformVideo with flip should not produce an error. Error: ${transformError?.code} - ${transformError?.message}',
+        );
+        expect(
+          progressEvents,
+          isNotEmpty,
+          reason:
+              'Should have received at least one progress event (with flip).',
+        );
+        expect(
+          progressEvents.first.progress,
+          equals(0.0),
+          reason: 'Initial progress should be 0.0 (with flip).',
+        );
+
+        final lastEvent = progressEvents.lastWhere(
+          (e) => e.outputPath != null || e.error != null,
+          orElse: () => progressEvents.last,
+        );
+
+        expect(
+          lastEvent.progress,
+          equals(1.0),
+          reason: 'Final progress should be 1.0 on success (with flip).',
+        );
+        expect(
+          lastEvent.outputPath,
+          isNotNull,
+          reason: 'Output path should be set on success (with flip).',
+        );
+        expect(
+          finalOutputPath,
+          isNotNull,
+          reason: 'Final output path variable should be set (with flip).',
+        );
+        expect(
+          finalOutputPath,
+          endsWith('.mp4'),
+          reason: 'Output file should be an mp4 (with flip).',
+        );
+
+        if (finalOutputPath != null) {
+          final outputFile = File(finalOutputPath);
+          expect(
+            await outputFile.exists(),
+            isTrue,
+            reason:
+                'Transformed video file (with flip) should exist at $finalOutputPath.',
+          );
+          // TODO: Add a more robust check to verify if the video is actually flipped.
+          // This might involve comparing frames or using a more advanced video analysis tool,
+          // which is beyond the scope of a simple integration test here.
+          // For now, we rely on the native transformation being correct.
           if (await outputFile.exists()) {
             await outputFile.delete();
           }
