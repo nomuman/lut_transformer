@@ -1,3 +1,8 @@
+## 1.0.3
+
+* Improved video cropping:
+    * The 1:1 aspect ratio crop now centers based on the video's shorter dimension, ensuring a more visually appealing centered square crop.
+
 ## 1.0.2
 
 * Modified `transformVideo` method:

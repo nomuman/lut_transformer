@@ -3,13 +3,13 @@
 [![pub version](https://img.shields.io/pub/v/lut_transformer.svg)](https://pub.dev/packages/lut_transformer)
 <!-- TODO: Add CI badge e.g. [![CI](https://github.com/nomuman/lut_transformer/actions/workflows/ci.yaml/badge.svg)](https://github.com/nomuman/lut_transformer/actions/workflows/ci.yaml) -->
 
-A Flutter plugin for applying 3D LUT (Look-Up Table) filters to videos on the **Android** platform. This plugin allows you to transform the colors of your videos using `.cube` LUT files. It also applies a 1:1 aspect ratio crop to the output video.
+A Flutter plugin for applying 3D LUT (Look-Up Table) filters to videos on the **Android** platform. This plugin allows you to transform the colors of your videos using `.cube` LUT files. It also applies a 1:1 aspect ratio crop, centering the crop based on the video's shorter dimension, to the output video.
 
 ## Features
 
 - Apply `.cube` LUT files to videos.
 - Reports transformation progress.
-- Output video is cropped to a 1:1 aspect ratio (e.g., 1080x1080).
+- Output video is cropped to a 1:1 aspect ratio, centered, using the shorter dimension of the video as the side length.
 - Option to flip the video horizontally.
 - Currently supports Android only.
 
