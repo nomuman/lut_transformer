@@ -63,6 +63,7 @@ object VideoTransformer {
         inputVideoPath: String,
         lutAssetKey: String?,
         flipHorizontally: Boolean,
+        cropSquareSize: Int?,
         onProgress: (Double) -> Unit,
         onCompleted: (String) -> Unit,
         onError: (String, String?, Any?) -> Unit
@@ -73,7 +74,7 @@ object VideoTransformer {
         val transformationRunning = AtomicBoolean(false) // Tracks if the core transformation is active
 
         try {
-            Log.d(TAG, "Transform: Starting setup for video '$inputVideoPath' with LUT asset '${lutAssetKey ?: "none"}', flip: $flipHorizontally")
+            Log.d(TAG, "Transform: Starting setup for video '$inputVideoPath' with LUT asset '${lutAssetKey ?: "none"}', flip: $flipHorizontally, cropSquareSize: $cropSquareSize")
             onProgress(0.0) // Initial progress: Setup phase started
 
             val videoEffects = mutableListOf<androidx.media3.common.Effect>()
@@ -97,23 +98,22 @@ object VideoTransformer {
             val retriever = MediaMetadataRetriever()
             try {
                 retriever.setDataSource(inputVideoPath)
-                val videoWidth = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toIntOrNull() ?: 1080 // Default to 1080 if not found
-                val videoHeight = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)?.toIntOrNull() ?: 1080 // Default to 1080 if not found
+                val videoWidth = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toIntOrNull() ?: 1080
+                val videoHeight = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)?.toIntOrNull() ?: 1080
                 Log.d(TAG, "Original video dimensions: $videoWidth x $videoHeight")
 
-                val cropSize = minOf(videoWidth, videoHeight)
-                Log.d(TAG, "Calculated crop size: $cropSize")
+                val finalCropSize = cropSquareSize ?: minOf(videoWidth, videoHeight)
+                Log.d(TAG, "Calculated crop size: $finalCropSize (requested: $cropSquareSize)")
 
                 val presentationEffect = Presentation.createForWidthAndHeight(
-                    cropSize,
-                    cropSize,
-                    Presentation.LAYOUT_SCALE_TO_FIT_WITH_CROP // Scales to fit the smaller dimension and crops the larger one, effectively centering.
+                    finalCropSize,
+                    finalCropSize,
+                    Presentation.LAYOUT_SCALE_TO_FIT_WITH_CROP
                 )
                 videoEffects.add(presentationEffect)
             } catch (e: Exception) {
                 Log.w(TAG, "Failed to get video dimensions for cropping, defaulting to 1080x1080 crop. Error: ${e.message}")
-                // Fallback to a default square crop if metadata retrieval fails
-                val defaultCropSize = 1080
+                val defaultCropSize = cropSquareSize ?: 1080 // Use requested size if available, else default
                 val presentationEffect = Presentation.createForWidthAndHeight(
                     defaultCropSize,
                     defaultCropSize,
@@ -123,7 +123,6 @@ object VideoTransformer {
             } finally {
                 retriever.release()
             }
-
             val effects = Effects(
                 /* audioEffects = */ emptyList(), // No audio effects applied in this version
                 /* videoEffects = */ videoEffects.toList()

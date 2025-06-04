@@ -1,3 +1,8 @@
+## 1.0.4
+
+* Modified `transformVideo` method:
+    * Added `cropSquareSize` parameter to specify the size of the square to crop the video to.
+
 ## 1.0.3
 
 * Improved video cropping:

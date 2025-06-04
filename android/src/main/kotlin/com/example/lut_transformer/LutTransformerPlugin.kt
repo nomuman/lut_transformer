@@ -59,6 +59,7 @@ class LutTransformerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Act
                 val inputPath = call.argument<String>("inputPath")
                 val lutAsset = call.argument<String?>("lutAsset")
                 val flipHorizontally = call.argument<Boolean>("flipHorizontally") ?: false
+                val cropSquareSize = call.argument<Int?>("cropSquareSize")
 
                 if (inputPath == null) {
                     result.error("INVALID_ARGUMENTS", "InputPath is null.", null)
@@ -77,7 +78,7 @@ class LutTransformerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Act
                     Log.w(TAG, "transformVideo called but Flutter assets are not available.")
                     return
                 }
-                startVideoTransformation(WeakReference(activity), assets, inputPath, lutAsset, flipHorizontally)
+                startVideoTransformation(WeakReference(activity), assets, inputPath, lutAsset, flipHorizontally, cropSquareSize)
                 result.success(null) // Acknowledge the call, actual result/progress via EventChannel
             }
             "getPlatformVersion" -> {
@@ -101,7 +102,8 @@ class LutTransformerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Act
         assets: FlutterPlugin.FlutterAssets,
         inputPath: String,
         lutAsset: String?,
-        flipHorizontally: Boolean
+        flipHorizontally: Boolean,
+        cropSquareSize: Int?
     ) {
         scope.launch {
             val activity = activityRef.get()
@@ -118,6 +120,7 @@ class LutTransformerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Act
                     inputPath,
                     lutAsset,
                     flipHorizontally,
+                    cropSquareSize,
                     onProgress = { progress ->
                         // Ensure events are sent on the main thread
                         scope.launch(Dispatchers.Main) {
