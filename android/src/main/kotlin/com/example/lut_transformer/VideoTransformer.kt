@@ -3,6 +3,7 @@ package com.example.lut_transformer
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import android.media.MediaMetadataRetriever
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MimeTypes
 import androidx.media3.effect.Presentation
@@ -92,16 +93,36 @@ object VideoTransformer {
                 videoEffects.add(flipEffect)
             }
 
-            // Apply a 1:1 aspect ratio crop.
-            // This is a fixed behavior of this plugin version.
-            // For more flexibility, these parameters could be exposed.
-            val targetResolution = 1080 // Output resolution for the cropped square video
-            val presentationEffect = Presentation.createForWidthAndHeight(
-                targetResolution,
-                targetResolution,
-                Presentation.LAYOUT_SCALE_TO_FIT_WITH_CROP // Scales to fit the smaller dimension and crops the larger one
-            )
-            videoEffects.add(presentationEffect)
+            // Apply a 1:1 aspect ratio crop, centered.
+            val retriever = MediaMetadataRetriever()
+            try {
+                retriever.setDataSource(inputVideoPath)
+                val videoWidth = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)?.toIntOrNull() ?: 1080 // Default to 1080 if not found
+                val videoHeight = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)?.toIntOrNull() ?: 1080 // Default to 1080 if not found
+                Log.d(TAG, "Original video dimensions: $videoWidth x $videoHeight")
+
+                val cropSize = minOf(videoWidth, videoHeight)
+                Log.d(TAG, "Calculated crop size: $cropSize")
+
+                val presentationEffect = Presentation.createForWidthAndHeight(
+                    cropSize,
+                    cropSize,
+                    Presentation.LAYOUT_SCALE_TO_FIT_WITH_CROP // Scales to fit the smaller dimension and crops the larger one, effectively centering.
+                )
+                videoEffects.add(presentationEffect)
+            } catch (e: Exception) {
+                Log.w(TAG, "Failed to get video dimensions for cropping, defaulting to 1080x1080 crop. Error: ${e.message}")
+                // Fallback to a default square crop if metadata retrieval fails
+                val defaultCropSize = 1080
+                val presentationEffect = Presentation.createForWidthAndHeight(
+                    defaultCropSize,
+                    defaultCropSize,
+                    Presentation.LAYOUT_SCALE_TO_FIT_WITH_CROP
+                )
+                videoEffects.add(presentationEffect)
+            } finally {
+                retriever.release()
+            }
 
             val effects = Effects(
                 /* audioEffects = */ emptyList(), // No audio effects applied in this version
