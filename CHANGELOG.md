@@ -1,3 +1,12 @@
+## 1.1.0
+
+* Added `lutIntensity` parameter to `transformVideo` method.
+    * This allows adjusting the strength of the LUT effect from 0.0 (no effect) to 1.0 (full effect).
+    * If `lutAsset` is provided and `lutIntensity` is null, it defaults to 1.0.
+* Updated Android native code (`CubeParser.kt`, `VideoTransformer.kt`, `LutTransformerPlugin.kt`) to support LUT intensity.
+* Updated Dart code (`lut_transformer.dart`) to include the `lutIntensity` parameter.
+* Updated `README.md` to document the new `lutIntensity` feature.
+
 ## 1.0.4
 
 * Modified `transformVideo` method:

@@ -40,6 +40,8 @@ class LutTransformer {
   ///
   /// The [input] is the video file to be transformed.
   /// The [lutAsset] is the asset path of the LUT filter to apply. If null, the video will only be cropped to a square.
+  /// The [lutIntensity] specifies the strength of the LUT effect, ranging from 0.0 (no effect) to 1.0 (full effect).
+  /// If `lutAsset` is provided and `lutIntensity` is null, it defaults to 1.0.
   /// The [flipHorizontally] flag indicates whether to flip the video horizontally. Defaults to `false`.
   /// The [cropSquareSize] specifies the size of the square to crop the video to. If null, no cropping is performed unless `lutAsset` is also null, in which case it defaults to the shorter dimension of the video.
   ///
@@ -49,15 +51,21 @@ class LutTransformer {
   static Stream<TransformProgress> transformVideo(
     File input, {
     String? lutAsset,
+    double? lutIntensity,
     bool flipHorizontally = false,
     int? cropSquareSize,
   }) {
+    assert(
+      lutIntensity == null || (lutIntensity >= 0.0 && lutIntensity <= 1.0),
+      "lutIntensity must be between 0.0 and 1.0, or null.",
+    );
     // Request the native side to start processing.
     // This call completes immediately, and the actual processing occurs in the background.
     // Progress is reported via the EventChannel.
     _methodChannel.invokeMethod<void>('transformVideo', {
       'inputPath': input.path,
       'lutAsset': lutAsset,
+      'lutIntensity': lutIntensity,
       'flipHorizontally': flipHorizontally,
       'cropSquareSize': cropSquareSize,
     });

@@ -31,6 +31,7 @@ class _MyAppState extends State<MyApp> {
   bool _isDownloading = false;
   String? _downloadMessage;
   bool _flipHorizontally = false;
+  double _lutIntensity = 1.0;
 
   @override
   void initState() {
@@ -110,6 +111,7 @@ class _MyAppState extends State<MyApp> {
       final stream = LutTransformer.transformVideo(
         File(_pickedVideoFile!.path),
         lutAsset: 'assets/luts/sample.cube',
+        lutIntensity: _lutIntensity,
         flipHorizontally: _flipHorizontally,
       );
 
@@ -292,6 +294,20 @@ class _MyAppState extends State<MyApp> {
               },
             ),
           ],
+        ),
+        const SizedBox(height: 10),
+        Text('LUT強度: ${(_lutIntensity * 100).toStringAsFixed(0)}%'),
+        Slider(
+          value: _lutIntensity,
+          min: 0.0,
+          max: 1.0,
+          divisions: 100,
+          label: '${(_lutIntensity * 100).toStringAsFixed(0)}%',
+          onChanged: (double value) {
+            setState(() {
+              _lutIntensity = value;
+            });
+          },
         ),
         if (_isProcessing)
           Padding(

@@ -52,6 +52,7 @@ object VideoTransformer {
      * @param flutterAssets For accessing plugin assets like the LUT file.
      * @param inputVideoPath The file path of the input video.
      * @param lutAssetKey The asset key for the .cube LUT file (e.g., "luts/my_lut.cube").
+     * @param lutIntensity The intensity of the LUT effect (0.0f to 1.0f). Defaults to 1.0f (full effect) if lutAssetKey is provided.
      * @param flipHorizontally Whether to flip the video horizontally.
      * @param onProgress Callback for progress updates (0.0 to 1.0).
      * @param onCompleted Callback when transformation is successful, providing the output file path.
@@ -62,6 +63,7 @@ object VideoTransformer {
         flutterAssets: FlutterAssets,
         inputVideoPath: String,
         lutAssetKey: String?,
+        lutIntensity: Float?,
         flipHorizontally: Boolean,
         cropSquareSize: Int?,
         onProgress: (Double) -> Unit,
@@ -74,7 +76,7 @@ object VideoTransformer {
         val transformationRunning = AtomicBoolean(false) // Tracks if the core transformation is active
 
         try {
-            Log.d(TAG, "Transform: Starting setup for video '$inputVideoPath' with LUT asset '${lutAssetKey ?: "none"}', flip: $flipHorizontally, cropSquareSize: $cropSquareSize")
+            Log.d(TAG, "Transform: Starting setup for video '$inputVideoPath' with LUT asset '${lutAssetKey ?: "none"}', intensity: $lutIntensity, flip: $flipHorizontally, cropSquareSize: $cropSquareSize")
             onProgress(0.0) // Initial progress: Setup phase started
 
             val videoEffects = mutableListOf<androidx.media3.common.Effect>()
@@ -82,7 +84,10 @@ object VideoTransformer {
             // Load LUT from assets if lutAssetKey is provided
             if (lutAssetKey != null) {
                 val actualLutAssetPath = flutterAssets.getAssetFilePathByName(lutAssetKey)
-                val lut = CubeParser.load(context, actualLutAssetPath) // This can throw IOException if LUT is invalid/not found
+                // Use provided lutIntensity, or default to 1.0f (full strength) if null.
+                // Clamp intensity to be between 0.0f and 1.0f.
+                val intensity = (lutIntensity ?: 1.0f).coerceIn(0.0f, 1.0f)
+                val lut = CubeParser.load(context, actualLutAssetPath, intensity) // This can throw IOException if LUT is invalid/not found
                 val lutEffect = SingleColorLut.createFromCube(lut)
                 videoEffects.add(lutEffect)
             }
