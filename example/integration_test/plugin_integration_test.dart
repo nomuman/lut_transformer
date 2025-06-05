@@ -62,7 +62,7 @@ void main() {
 
         final List<TransformProgress> progressEvents = [];
         String? finalOutputPath;
-        PlatformException? transformError;
+        Object? transformError;
 
         final stream = LutTransformer.transformVideo(
           tempVideoFile,
@@ -88,8 +88,7 @@ void main() {
         expect(
           transformError,
           isNull,
-          reason:
-              'transformVideo should not produce an error for valid inputs. Error: ${transformError?.code} - ${transformError?.message}',
+          reason: 'transformVideo should not produce an error for valid inputs.',
         );
         expect(
           progressEvents,
@@ -186,7 +185,7 @@ void main() {
 
         final List<TransformProgress> progressEvents = [];
         String? finalOutputPath;
-        PlatformException? transformError;
+        Object? transformError;
 
         // Call transformVideo with lutAsset as null
         final stream = LutTransformer.transformVideo(
@@ -212,8 +211,7 @@ void main() {
         expect(
           transformError,
           isNull,
-          reason:
-              'transformVideo (crop only) should not produce an error. Error: ${transformError?.code} - ${transformError?.message}',
+          reason: 'transformVideo (crop only) should not produce an error.',
         );
         expect(
           progressEvents,
@@ -291,7 +289,7 @@ void main() {
         const String lutAssetPath = 'assets/luts/sample.cube';
         final List<TransformProgress> progressEvents = [];
         String? finalOutputPath;
-        PlatformException? transformError;
+        Object? transformError;
 
         final stream = LutTransformer.transformVideo(
           tempVideoFile,
@@ -316,8 +314,7 @@ void main() {
         expect(
           transformError,
           isNull,
-          reason:
-              'transformVideo with flip should not produce an error. Error: ${transformError?.code} - ${transformError?.message}',
+          reason: 'transformVideo with flip should not produce an error.',
         );
         expect(
           progressEvents,

@@ -26,5 +26,7 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.example.lut_transformer 
-        pluginClass: LutTransformerPlugin 
+        package: com.example.lut_transformer
+        pluginClass: LutTransformerPlugin
+      ios:
+        pluginClass: LutTransformerPlugin
