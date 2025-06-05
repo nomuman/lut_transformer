@@ -10,6 +10,7 @@ A Flutter plugin for applying 3D LUT (Look-Up Table) filters to videos on the **
 - Apply `.cube` LUT files to videos.
 - Reports transformation progress.
 - Output video is cropped to a 1:1 aspect ratio, centered, using the shorter dimension of the video as the side length.
+- Option to adjust the intensity of the LUT effect (0.0 to 1.0).
 - Option to flip the video horizontally.
 - Works on both Android and iOS using platform specific implementations.
 
@@ -61,7 +62,14 @@ import 'dart:io'; // For File objects
 
 ### Transforming a Video
 
-To transform a video, use the static method `LutTransformer.transformVideo`. You need to provide the input video `File`, optionally the asset path to your `.cube` LUT file, and an optional boolean `flipHorizontally` (defaults to `false`) to indicate if the video should be flipped horizontally. If `lutAsset` is `null`, the video will only be cropped to a square (and potentially flipped).
+To transform a video, use the static method `LutTransformer.transformVideo`. You need to provide:
+-   The input video `File`.
+-   Optionally, the asset path to your `.cube` LUT file (`lutAsset`).
+-   Optionally, the intensity of the LUT effect (`lutIntensity`), a `double` value between 0.0 (no effect) and 1.0 (full effect). If `lutAsset` is provided and `lutIntensity` is `null`, it defaults to 1.0.
+-   Optionally, a boolean `flipHorizontally` (defaults to `false`) to indicate if the video should be flipped horizontally.
+-   Optionally, `cropSquareSize` to specify the output video dimension.
+
+If `lutAsset` is `null`, the video will only be cropped (and potentially flipped), and `lutIntensity` will be ignored.
 
 The method returns a `Stream<TransformProgress>` which emits progress updates and the final result (output path or error).
 
@@ -78,10 +86,11 @@ The method returns a `Stream<TransformProgress>` which emits progress updates an
 2.  **Call `transformVideo` and listen to the stream:**
 
     ```dart
-    Future<void> applyLutToVideo(File videoFile, String? lutAssetPath, bool shouldFlip) async {
+    Future<void> applyLutToVideo(File videoFile, String? lutAssetPath, double? lutStrength, bool shouldFlip) async {
       final Stream<TransformProgress> progressStream = LutTransformer.transformVideo(
         videoFile,
         lutAsset: lutAssetPath, // e.g., 'assets/luts/my_custom_lut.cube' or null
+        lutIntensity: lutStrength, // e.g., 0.5 for 50% intensity, or null for default (1.0)
         flipHorizontally: shouldFlip,
       );
 
@@ -108,8 +117,9 @@ The method returns a `Stream<TransformProgress>` which emits progress updates an
     // Example usage:
     // File myVideo = File('path/to/your/input_video.mp4');
     // String myLut = 'assets/luts/my_custom_lut.cube';
+    // double? intensity = 0.75; // 75% strength
     // bool flip = true;
-    // await applyLutToVideo(myVideo, myLut, flip);
+    // await applyLutToVideo(myVideo, myLut, intensity, flip);
     ```
 
 ### `TransformProgress` Class

@@ -58,6 +58,8 @@ class LutTransformerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Act
             "transformVideo" -> {
                 val inputPath = call.argument<String>("inputPath")
                 val lutAsset = call.argument<String?>("lutAsset")
+                val lutIntensityDouble = call.argument<Double?>("lutIntensity")
+                val lutIntensity = lutIntensityDouble?.toFloat()
                 val flipHorizontally = call.argument<Boolean>("flipHorizontally") ?: false
                 val cropSquareSize = call.argument<Int?>("cropSquareSize")
 
@@ -78,7 +80,7 @@ class LutTransformerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Act
                     Log.w(TAG, "transformVideo called but Flutter assets are not available.")
                     return
                 }
-                startVideoTransformation(WeakReference(activity), assets, inputPath, lutAsset, flipHorizontally, cropSquareSize)
+                startVideoTransformation(WeakReference(activity), assets, inputPath, lutAsset, lutIntensity, flipHorizontally, cropSquareSize)
                 result.success(null) // Acknowledge the call, actual result/progress via EventChannel
             }
             "getPlatformVersion" -> {
@@ -95,6 +97,7 @@ class LutTransformerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Act
      * @param assets FlutterAssets for accessing plugin assets.
      * @param inputPath Path to the input video file.
      * @param lutAsset Asset path for the LUT file.
+     * @param lutIntensity Intensity of the LUT effect.
      * @param flipHorizontally Whether to flip the video horizontally.
      */
     private fun startVideoTransformation(
@@ -102,6 +105,7 @@ class LutTransformerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Act
         assets: FlutterPlugin.FlutterAssets,
         inputPath: String,
         lutAsset: String?,
+        lutIntensity: Float?,
         flipHorizontally: Boolean,
         cropSquareSize: Int?
     ) {
@@ -119,6 +123,7 @@ class LutTransformerPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, Act
                     assets,
                     inputPath,
                     lutAsset,
+                    lutIntensity,
                     flipHorizontally,
                     cropSquareSize,
                     onProgress = { progress ->
