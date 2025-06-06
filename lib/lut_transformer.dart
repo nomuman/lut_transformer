@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/services.dart';
 
 import 'src/transform_progress.dart';
 import 'src/lut_transformer_platform_interface.dart';
