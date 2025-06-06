@@ -1,3 +1,4 @@
+import 'package:lut_transformer/src/transform_progress.dart';
 // Flutter integration tests for the lut_transformer plugin.
 //
 // Integration tests run in a full Flutter application, allowing interaction
@@ -62,7 +63,7 @@ void main() {
 
         final List<TransformProgress> progressEvents = [];
         String? finalOutputPath;
-        PlatformException? transformError;
+        Object? transformError;
 
         final stream = LutTransformer.transformVideo(
           tempVideoFile,
@@ -89,7 +90,7 @@ void main() {
           transformError,
           isNull,
           reason:
-              'transformVideo should not produce an error for valid inputs. Error: ${transformError?.code} - ${transformError?.message}',
+              'transformVideo should not produce an error for valid inputs.',
         );
         expect(
           progressEvents,
@@ -107,7 +108,7 @@ void main() {
         // Check for intermediate progress if dummy progress is working
         // This depends on the native implementation's dummy progress logic
         bool hasIntermediateProgress = progressEvents.any(
-          (p) =>
+          (TransformProgress p) =>
               p.progress > 0.0 &&
               p.progress < 1.0 &&
               p.outputPath == null &&
@@ -119,7 +120,7 @@ void main() {
 
         // Check final progress and output path
         final lastEvent = progressEvents.lastWhere(
-          (e) => e.outputPath != null || e.error != null,
+          (TransformProgress e) => e.outputPath != null || e.error != null,
           orElse: () => progressEvents.last,
         );
 
@@ -186,7 +187,7 @@ void main() {
 
         final List<TransformProgress> progressEvents = [];
         String? finalOutputPath;
-        PlatformException? transformError;
+        Object? transformError;
 
         // Call transformVideo with lutAsset as null
         final stream = LutTransformer.transformVideo(
@@ -212,8 +213,7 @@ void main() {
         expect(
           transformError,
           isNull,
-          reason:
-              'transformVideo (crop only) should not produce an error. Error: ${transformError?.code} - ${transformError?.message}',
+          reason: 'transformVideo (crop only) should not produce an error.',
         );
         expect(
           progressEvents,
@@ -229,7 +229,7 @@ void main() {
         );
 
         final lastEvent = progressEvents.lastWhere(
-          (e) => e.outputPath != null || e.error != null,
+          (TransformProgress e) => e.outputPath != null || e.error != null,
           orElse: () => progressEvents.last,
         );
 
@@ -291,7 +291,7 @@ void main() {
         const String lutAssetPath = 'assets/luts/sample.cube';
         final List<TransformProgress> progressEvents = [];
         String? finalOutputPath;
-        PlatformException? transformError;
+        Object? transformError;
 
         final stream = LutTransformer.transformVideo(
           tempVideoFile,
@@ -316,8 +316,7 @@ void main() {
         expect(
           transformError,
           isNull,
-          reason:
-              'transformVideo with flip should not produce an error. Error: ${transformError?.code} - ${transformError?.message}',
+          reason: 'transformVideo with flip should not produce an error.',
         );
         expect(
           progressEvents,
@@ -332,7 +331,7 @@ void main() {
         );
 
         final lastEvent = progressEvents.lastWhere(
-          (e) => e.outputPath != null || e.error != null,
+          (TransformProgress e) => e.outputPath != null || e.error != null,
           orElse: () => progressEvents.last,
         );
 

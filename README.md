@@ -12,15 +12,15 @@ A Flutter plugin for applying 3D LUT (Look-Up Table) filters to videos on the **
 - Output video is cropped to a 1:1 aspect ratio, centered, using the shorter dimension of the video as the side length.
 - Option to adjust the intensity of the LUT effect (0.0 to 1.0).
 - Option to flip the video horizontally.
-- Currently supports Android only.
+- Works on both Android and iOS using platform specific implementations.
 
 ## Platform Support
 
 | Android | iOS     | Web     | macOS   | Windows | Linux   |
 | :------ | :------ | :------ | :------ | :------ | :------ |
-| ✅      | ❌      | ❌      | ❌      | ❌      | ❌      |
+| ✅      | ✅      | ❌      | ❌      | ❌      | ❌      |
 
-iOS and other platform support may be considered in the future.
+The plugin now provides full transformation functionality on both Android and iOS.
 
 ## Getting Started
 
@@ -46,7 +46,9 @@ No specific additional setup is required for Android beyond the standard Flutter
 
 ### iOS Setup
 
-iOS is not currently supported.
+The plugin includes a minimal iOS implementation which currently emits an error
+when video transformation is requested. No special setup is required aside from
+standard Flutter iOS configuration.
 
 ## Usage
 
