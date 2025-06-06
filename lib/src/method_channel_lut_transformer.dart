@@ -7,12 +7,18 @@ import 'transform_progress.dart';
 
 /// An implementation of [LutTransformerPlatform] that uses method channels.
 class MethodChannelLutTransformer extends LutTransformerPlatform {
-  static const MethodChannel _methodChannel = MethodChannel('lut_transformer/method');
-  static const EventChannel _eventChannel = EventChannel('lut_transformer/event');
+  static const MethodChannel _methodChannel = MethodChannel(
+    'lut_transformer/method',
+  );
+  static const EventChannel _eventChannel = EventChannel(
+    'lut_transformer/event',
+  );
 
   @override
   Future<String?> getPlatformVersion() async {
-    final version = await _methodChannel.invokeMethod<String>('getPlatformVersion');
+    final version = await _methodChannel.invokeMethod<String>(
+      'getPlatformVersion',
+    );
     return version;
   }
 
@@ -20,12 +26,14 @@ class MethodChannelLutTransformer extends LutTransformerPlatform {
   Stream<TransformProgress> transformVideo(
     File input, {
     String? lutAsset,
+    double? lutIntensity,
     bool flipHorizontally = false,
     int? cropSquareSize,
   }) {
     _methodChannel.invokeMethod<void>('transformVideo', {
       'inputPath': input.path,
       'lutAsset': lutAsset,
+      'lutIntensity': lutIntensity,
       'flipHorizontally': flipHorizontally,
       'cropSquareSize': cropSquareSize,
     });

@@ -28,6 +28,7 @@ public class LutTransformerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
       let lutAsset = args["lutAsset"] as? String
       let flipHorizontally = args["flipHorizontally"] as? Bool ?? false
       let cropSquareSize = args["cropSquareSize"] as? Int
+      let lutIntensity = args["lutIntensity"] as? Double ?? 1.0
 
       var lutPath: String?
       if let asset = lutAsset, let registrar = registrar {
@@ -40,6 +41,7 @@ public class LutTransformerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
       VideoTransformer.transform(
         inputPath: inputPath,
         lutPath: lutPath,
+        lutIntensity: lutIntensity,
         flipHorizontally: flipHorizontally,
         cropSquareSize: cropSquareSize,
         onProgress: { [weak self] progress in

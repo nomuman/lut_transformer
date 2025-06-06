@@ -71,6 +71,7 @@ class VideoTransformer {
     static func transform(
         inputPath: String,
         lutPath: String?,
+        lutIntensity: Double,
         flipHorizontally: Bool,
         cropSquareSize: Int?,
         onProgress: @escaping (Double) -> Void,
@@ -125,13 +126,27 @@ class VideoTransformer {
                 processedImage = processedImage.cropped(to: cropRect)
 
                 // 3. Apply the LUT filter.
-                if let data = lutData, lutDimension > 0 {
-                    let filter = CIFilter(name: "CIColorCube")!
-                    filter.setValue(lutDimension, forKey: "inputCubeDimension")
-                    filter.setValue(data, forKey: "inputCubeData")
-                    filter.setValue(processedImage, forKey: kCIInputImageKey)
-                    if let output = filter.outputImage {
-                        processedImage = output
+                if let data = lutData, lutDimension > 0, lutIntensity > 0 {
+                    let originalImage = processedImage
+                    let lutAppliedImage: CIImage
+                    
+                    let colorCubeFilter = CIFilter(name: "CIColorCube")!
+                    colorCubeFilter.setValue(lutDimension, forKey: "inputCubeDimension")
+                    colorCubeFilter.setValue(data, forKey: "inputCubeData")
+                    colorCubeFilter.setValue(originalImage, forKey: kCIInputImageKey)
+                    
+                    lutAppliedImage = colorCubeFilter.outputImage ?? originalImage
+                    
+                    if lutIntensity < 1.0 {
+                        let dissolveFilter = CIFilter(name: "CIDissolveTransition")!
+                        dissolveFilter.setValue(lutAppliedImage, forKey: kCIInputImageKey)
+                        dissolveFilter.setValue(originalImage, forKey: kCIInputTargetImageKey)
+                        dissolveFilter.setValue(lutIntensity, forKey: kCIInputTimeKey)
+                        if let output = dissolveFilter.outputImage {
+                            processedImage = output
+                        }
+                    } else {
+                        processedImage = lutAppliedImage
                     }
                 }
                 request.finish(with: processedImage, context: nil)

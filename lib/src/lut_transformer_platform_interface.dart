@@ -28,6 +28,7 @@ abstract class LutTransformerPlatform extends PlatformInterface {
   Stream<TransformProgress> transformVideo(
     File input, {
     String? lutAsset,
+    double? lutIntensity,
     bool flipHorizontally = false,
     int? cropSquareSize,
   });
