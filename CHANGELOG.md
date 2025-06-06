@@ -1,3 +1,10 @@
+## 1.2.0
+
+* Added iOS support.
+    * The plugin now supports applying 3D LUT (.cube) filters to videos on the iOS platform.
+    * Implemented native iOS code (`LutTransformerPlugin.swift`, `VideoTransformer.swift`) to handle video transformation.
+    * Updated `lut_transformer.podspec` for iOS configuration.
+
 ## 1.1.0
 
 * Added `lutIntensity` parameter to `transformVideo` method.
