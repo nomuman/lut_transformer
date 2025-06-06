@@ -118,8 +118,7 @@ class _MyAppState extends State<MyApp> {
         setState(() {
           _currentProgress = event.progress;
           if (event.error != null) {
-            _errorMessage =
-                '動画の加工中にエラーが発生しました: ${event.error!.message} (コード: ${event.error!.code})';
+            _errorMessage = '動画の加工中にエラーが発生しました: ${event.error!})';
             _progressMessage = 'エラーが発生しました';
             _isProcessing = false;
           } else if (event.outputPath != null) {

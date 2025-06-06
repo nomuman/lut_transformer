@@ -1,3 +1,4 @@
+import 'package:lut_transformer/src/transform_progress.dart';
 // Flutter integration tests for the lut_transformer plugin.
 //
 // Integration tests run in a full Flutter application, allowing interaction
@@ -88,7 +89,8 @@ void main() {
         expect(
           transformError,
           isNull,
-          reason: 'transformVideo should not produce an error for valid inputs.',
+          reason:
+              'transformVideo should not produce an error for valid inputs.',
         );
         expect(
           progressEvents,
@@ -106,7 +108,7 @@ void main() {
         // Check for intermediate progress if dummy progress is working
         // This depends on the native implementation's dummy progress logic
         bool hasIntermediateProgress = progressEvents.any(
-          (p) =>
+          (TransformProgress p) =>
               p.progress > 0.0 &&
               p.progress < 1.0 &&
               p.outputPath == null &&
@@ -118,7 +120,7 @@ void main() {
 
         // Check final progress and output path
         final lastEvent = progressEvents.lastWhere(
-          (e) => e.outputPath != null || e.error != null,
+          (TransformProgress e) => e.outputPath != null || e.error != null,
           orElse: () => progressEvents.last,
         );
 
@@ -227,7 +229,7 @@ void main() {
         );
 
         final lastEvent = progressEvents.lastWhere(
-          (e) => e.outputPath != null || e.error != null,
+          (TransformProgress e) => e.outputPath != null || e.error != null,
           orElse: () => progressEvents.last,
         );
 
@@ -329,7 +331,7 @@ void main() {
         );
 
         final lastEvent = progressEvents.lastWhere(
-          (e) => e.outputPath != null || e.error != null,
+          (TransformProgress e) => e.outputPath != null || e.error != null,
           orElse: () => progressEvents.last,
         );
 

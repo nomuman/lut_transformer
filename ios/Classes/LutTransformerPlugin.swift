@@ -31,7 +31,10 @@ public class LutTransformerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
 
       var lutPath: String?
       if let asset = lutAsset, let registrar = registrar {
-        lutPath = registrar.lookupKey(forAsset: asset)
+        let key = registrar.lookupKey(forAsset: asset)
+        if !key.isEmpty {
+            lutPath = Bundle.main.path(forResource: key, ofType: nil)
+        }
       }
 
       VideoTransformer.transform(
@@ -44,11 +47,11 @@ public class LutTransformerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler
         },
         onCompleted: { [weak self] output in
           self?.eventSink?(["progress": 1.0, "outputPath": output])
-          self?.eventSink = nil
+          self?.eventSink?(FlutterEndOfEventStream)
         },
         onError: { [weak self] code, message in
           self?.eventSink?(["progress": 0.0, "errorCode": code, "errorMessage": message ?? "error", "errorDetails": nil])
-          self?.eventSink = nil
+          self?.eventSink?(FlutterEndOfEventStream)
         }
       )
       result(nil)
