@@ -39,6 +39,7 @@ class LutTransformer {
       lutIntensity == null || (lutIntensity >= 0.0 && lutIntensity <= 1.0),
       "lutIntensity must be between 0.0 and 1.0, or null.",
     );
+
     return _platform.transformVideo(
       input,
       lutAsset: lutAsset,
