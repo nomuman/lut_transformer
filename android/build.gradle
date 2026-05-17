@@ -24,7 +24,7 @@ allprojects {
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 
-def media3Version = "1.7.1"
+def media3Version = "1.9.2"
 
 android {
     namespace = "com.example.lut_transformer"
