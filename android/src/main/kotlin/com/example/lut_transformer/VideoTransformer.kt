@@ -138,9 +138,8 @@ object VideoTransformer {
                 .setEffects(effects)
                 .build()
 
-            val editedMediaItemSequence = EditedMediaItemSequence(listOf(editedMediaItem))
-            // For concatenating multiple clips, add more EditedMediaItem to the list above,
-            // or add more EditedMediaItemSequence to the compositionBuilder list.
+            val editedMediaItemSequence =
+                EditedMediaItemSequence.withAudioAndVideoFrom(listOf(editedMediaItem))
             val composition = Composition.Builder(listOf(editedMediaItemSequence)).build()
 
             val outputVideoFile = File(context.cacheDir, "transformed_${UUID.randomUUID()}.mp4")

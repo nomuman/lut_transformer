@@ -1,3 +1,8 @@
+## 1.2.1
+
+* Updated Android Media3 dependencies to 1.9.2.
+* Fixed Android video transformation crashes caused by the removed `EditedMediaItemSequence(List)` constructor.
+
 ## 1.2.0
 
 * Added iOS support.
